@@ -1,10 +1,12 @@
 package com.chrkb1569.CharacterName.service;
 
+import com.chrkb1569.CharacterName.exception.APIRequestException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -36,15 +38,13 @@ public class APIService {
         try {
             HttpURLConnection connection = getURLConnection(pageNumber);
 
-            checkResponseValidation(connection); // 요청 결과 확인
-
-            return handleAPIResult(connection);
-        } catch (Exception e) {
-            throw new RuntimeException();
+            return getAPIResult(connection);
+        } catch (IOException e) {
+            throw new APIRequestException();
         }
     }
 
-    private HttpURLConnection getURLConnection(final int pageNumber) throws Exception {
+    private HttpURLConnection getURLConnection(final int pageNumber) throws IOException {
         URL url = getURL(pageNumber);
 
         // HTTP connection 설정
@@ -55,18 +55,11 @@ public class APIService {
         return connection;
     }
 
-    private URL getURL(final int pageNumber) throws Exception {
+    private URL getURL(final int pageNumber) throws IOException {
         return new URL(String.format(HTTP_REQUEST_URL, HTTP_REQUEST_DATE, pageNumber));
     }
 
-    // 응답 코드가 200이 아닌 경우, 오류 메세지 처리
-    private void checkResponseValidation(HttpURLConnection connection) throws Exception {
-        int responseCode = connection.getResponseCode();
-
-        if(responseCode != HttpStatus.OK.value()) throw new RuntimeException();
-    }
-
-    private String handleAPIResult(HttpURLConnection connection) throws Exception {
+    private String getAPIResult(HttpURLConnection connection) throws IOException {
         int responseCode = connection.getResponseCode();
 
         if(responseCode == HttpStatus.OK.value())
@@ -75,7 +68,7 @@ public class APIService {
     }
 
     // API 응답 데이터 파싱
-    private String getResponseData(BufferedReader br) throws Exception {
+    private String getResponseData(BufferedReader br) throws IOException {
         StringBuilder response = new StringBuilder();
 
         while (true) {
