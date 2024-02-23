@@ -2,6 +2,7 @@
 ## About Repository
 ## History
 - 데이터 가공 및 저장 기능 구현 완료 (2024.02.20)
+- 캐릭터 이름, 식별자 저장 기능 구현 완료 (2024.02.23)
 ## Trouble Shooting
 ## Git Convention
 ```
