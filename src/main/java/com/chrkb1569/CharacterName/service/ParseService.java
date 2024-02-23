@@ -29,17 +29,28 @@ public class ParseService {
     @Value("${api.info.levelKey}")
     private String LEVEL_KEY;
 
+    @Value("${api.info.identifierKey}")
+    private String IDENTIFIER_KEY;
+
     @Value("${api.info.limitLevel}")
     private int LIMIT_LEVEL;
 
     private final APIService apiService;
 
     public List<String> getCharacterNames(final int pageNumber) {
-        String apiData = apiService.getAPIData(pageNumber);
+        String apiData = apiService.getCharacterNames(pageNumber);
 
         checkValidation(apiData);
 
-        return parseData(apiData);
+        return parseDataToCharacterNames(apiData);
+    }
+
+    public String getCharacterIdentifier(final String characterName) {
+        String apiData = apiService.getCharacterIdentifier(characterName);
+
+        checkValidation(apiData);
+
+        return parseDataToIdentifier(apiData);
     }
 
     private void checkValidation(String apiData) {
@@ -53,7 +64,7 @@ public class ParseService {
         throw new APIResultException(errorMessage);
     }
 
-    private List<String> parseData(String apiData) {
+    private List<String> parseDataToCharacterNames(String apiData) {
         List<String> characterNames = new ArrayList<>();
 
         JSONObject jsonObject = new JSONObject(apiData);
@@ -69,5 +80,11 @@ public class ParseService {
         }
 
         return characterNames;
+    }
+
+    private String parseDataToIdentifier(String apiData) {
+        JSONObject jsonObject = new JSONObject(apiData);
+
+        return jsonObject.getString(IDENTIFIER_KEY);
     }
 }
