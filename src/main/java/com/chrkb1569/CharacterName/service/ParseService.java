@@ -1,8 +1,7 @@
 package com.chrkb1569.CharacterName.service;
 
-import com.chrkb1569.CharacterName.exception.APIResultException;
-import com.chrkb1569.CharacterName.util.APIExceptionMessage;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
@@ -11,7 +10,10 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.chrkb1569.CharacterName.util.APIExceptionMessage.*;
+
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class ParseService {
     @Value("${api.info.errorKey}")
@@ -48,20 +50,22 @@ public class ParseService {
     public String getCharacterIdentifier(final String characterName) {
         String apiData = apiService.getCharacterIdentifier(characterName);
 
-        checkValidation(apiData);
+        if(!checkValidation(apiData)) return null;
 
         return parseDataToIdentifier(apiData);
     }
 
-    private void checkValidation(String apiData) {
+    private boolean checkValidation(String apiData) {
         JSONObject jsonObject = new JSONObject(apiData);
 
-        if(!jsonObject.has(ERROR_KEY)) return;
+        if(!jsonObject.has(ERROR_KEY)) return true;
 
         JSONObject errorObject = (JSONObject)jsonObject.get(ERROR_KEY);
-        String errorMessage = APIExceptionMessage.getErrorMessageByType((String)errorObject.get(ERROR_TYPE));
+        String errorMessage = getErrorMessageByType((String)errorObject.get(ERROR_TYPE));
 
-        throw new APIResultException(errorMessage);
+        log.info(errorMessage);
+
+        return false;
     }
 
     private List<String> parseDataToCharacterNames(String apiData) {

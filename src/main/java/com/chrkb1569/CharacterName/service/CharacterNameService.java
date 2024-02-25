@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 
@@ -59,6 +60,8 @@ public class CharacterNameService {
         for(String characterName : characterNames) {
             String characterIdentifier = parseService.getCharacterIdentifier(characterName);
 
+            if(!checkValidation(characterIdentifier)) continue;
+
             CharacterName instance = getInstance(characterName, characterIdentifier);
 
             characterNameRepository.save(instance);
@@ -73,5 +76,9 @@ public class CharacterNameService {
 
     private CharacterName getInstance(String characterName, String characterIdentifier) {
         return new CharacterName(characterName, characterIdentifier);
+    }
+
+    private boolean checkValidation(String identifier) {
+        return StringUtils.hasText(identifier);
     }
 }

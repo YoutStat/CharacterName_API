@@ -1,6 +1,7 @@
 package com.chrkb1569.CharacterName.util;
 
 import java.util.Arrays;
+import java.util.Optional;
 
 public enum APIExceptionMessage {
     ERROR_MESSAGE_1("OPENAPI_CONTENT_0001", "서버 내부에서 오류가 발생하였습니다."),
@@ -14,6 +15,7 @@ public enum APIExceptionMessage {
     ERROR_MESSAGE_10("OPENAPI_CONTENT_0010", "서비스 점검 중입니다.")
     ;
 
+    private final static String DEFAULT_ERROR_MESSAGE = "API 요청에 실패하였습니다.";
     private String errorType;
     private String errorMessage;
 
@@ -23,8 +25,12 @@ public enum APIExceptionMessage {
     }
 
     public static String getErrorMessageByType(String errorType) {
-        return Arrays.stream(values())
+        Optional<APIExceptionMessage> exceptionMessage = Arrays.stream(values())
                 .filter(message -> message.errorType.equals(errorType))
-                .findFirst().get().errorMessage;
+                .findFirst();
+
+        if(!exceptionMessage.isPresent()) return DEFAULT_ERROR_MESSAGE;
+
+        return exceptionMessage.get().errorMessage;
     }
 }
