@@ -10,39 +10,33 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.chrkb1569.CharacterName.util.APIExceptionMessage.*;
+import static com.chrkb1569.CharacterName.util.APIValidator.*;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class ParseService {
-    @Value("${api.info.errorKey}")
-    private String ERROR_KEY;
-
-    @Value("${api.info.errorType}")
-    private String ERROR_TYPE;
-
-    @Value("${api.info.rankingKey}")
+    @Value("${api.request.name.rankingKey}")
     private String RANKING_KEY;
 
-    @Value("${api.info.nameKey}")
+    @Value("${api.request.name.nameKey}")
     private String NAME_KEY;
 
-    @Value("${api.info.levelKey}")
+    @Value("${api.request.name.levelKey}")
     private String LEVEL_KEY;
+
+    @Value("${api.request.name.limitLevel}")
+    private int LIMIT_LEVEL;
 
     @Value("${api.info.identifierKey}")
     private String IDENTIFIER_KEY;
 
-    @Value("${api.info.limitLevel}")
-    private int LIMIT_LEVEL;
-
     private final APIService apiService;
 
-    public List<String> getCharacterNames(final int pageNumber) {
+    public List<String> getCharacterNames(final long pageNumber) {
         String apiData = apiService.getCharacterNames(pageNumber);
 
-        checkValidation(apiData);
+        if(!checkAPIValidation(apiData)) return null;
 
         return parseDataToCharacterNames(apiData);
     }
@@ -50,22 +44,9 @@ public class ParseService {
     public String getCharacterIdentifier(final String characterName) {
         String apiData = apiService.getCharacterIdentifier(characterName);
 
-        if(!checkValidation(apiData)) return null;
+        if(!checkAPIValidation(apiData)) return null;
 
         return parseDataToIdentifier(apiData);
-    }
-
-    private boolean checkValidation(String apiData) {
-        JSONObject jsonObject = new JSONObject(apiData);
-
-        if(!jsonObject.has(ERROR_KEY)) return true;
-
-        JSONObject errorObject = (JSONObject)jsonObject.get(ERROR_KEY);
-        String errorMessage = getErrorMessageByType((String)errorObject.get(ERROR_TYPE));
-
-        log.info(errorMessage);
-
-        return false;
     }
 
     private List<String> parseDataToCharacterNames(String apiData) {
