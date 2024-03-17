@@ -1,4 +1,4 @@
-package com.chrkb1569.CharacterName.config;
+package com.chrkb1569.CharacterName.config.s3;
 
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
