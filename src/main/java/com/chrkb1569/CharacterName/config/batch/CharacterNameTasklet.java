@@ -10,6 +10,7 @@ import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -32,20 +33,18 @@ public class CharacterNameTasklet implements Tasklet {
         long PAGE_NUMBER = getPageNumber(contribution);
 
         String fileName = BASIC_FILE_NAME + PAGE_NUMBER;
-        List<String> characterNames = parseService.getCharacterNames(PAGE_NUMBER);
-
-        System.out.println(characterNames);
-
-        s3Service.saveCharacterNames(fileName, characterNames);
-
-        if(characterNames.size() != MAX_LIST_SIZE) return RepeatStatus.FINISHED;
-
-        contribution.getStepExecution().getJobExecution().getExecutionContext().putLong(PAGE_KEY, ++PAGE_NUMBER);
 
         try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+            List<String> characterNames = parseService.getCharacterNames(PAGE_NUMBER);
+            List<String> characterIdentifier = getCharacterIdentifier(characterNames);
+
+            s3Service.saveCharacterNames(fileName, characterIdentifier);
+
+            if(characterNames.size() != MAX_LIST_SIZE) return RepeatStatus.FINISHED;
+
+            contribution.getStepExecution().getJobExecution().getExecutionContext().putLong(PAGE_KEY, ++PAGE_NUMBER);
+        } catch (Exception e) {
+            return RepeatStatus.FINISHED;
         }
 
         return RepeatStatus.CONTINUABLE;
@@ -53,5 +52,17 @@ public class CharacterNameTasklet implements Tasklet {
 
     private long getPageNumber(StepContribution contribution) {
         return contribution.getStepExecution().getJobExecution().getExecutionContext().getLong(PAGE_KEY);
+    }
+
+    private List<String> getCharacterIdentifier(List<String> characterNames) throws Exception {
+        List<String> characterIdentifier = new ArrayList<>();
+
+        for(String characterName : characterNames) {
+            String identifier = parseService.getCharacterIdentifier(characterName);
+            characterIdentifier.add(identifier);
+            Thread.sleep(1000);
+        }
+
+        return characterIdentifier;
     }
 }
