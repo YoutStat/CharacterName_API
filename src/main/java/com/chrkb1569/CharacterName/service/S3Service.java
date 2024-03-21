@@ -2,17 +2,12 @@ package com.chrkb1569.CharacterName.service;
 
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.amazonaws.services.s3.model.S3Object;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -38,38 +33,7 @@ public class S3Service {
         amazonS3Client.putObject(bucketName, addedExtension, new ByteArrayInputStream(byteArr), metadata);
     }
 
-    public List<String> getCharacterNames(String fileName) {
-        String fileKey = addExtension(fileName);
-
-        S3Object characterName = amazonS3Client.getObject(bucketName, fileKey);
-
-        String convertedValue = convertObjectToString(characterName);
-
-        return Arrays.stream(convertedValue.split(SEPERATOR)).toList();
-    }
-
     private String addExtension(String fileName) {
         return fileName + TEXT_FILE_EXTENSION;
-    }
-
-    private String convertObjectToString(S3Object characterName) {
-        try {
-            BufferedReader br = new BufferedReader(new InputStreamReader(characterName.getObjectContent(), "UTF-8"));
-            StringBuilder response = new StringBuilder();
-
-            while (true) {
-                String inputValue = br.readLine();
-
-                if(inputValue == null) break;
-
-                response.append(inputValue);
-            }
-
-            br.close();
-
-            return response.toString();
-        } catch (IOException e) {
-            throw new RuntimeException();
-        }
     }
 }
