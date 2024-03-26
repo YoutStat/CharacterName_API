@@ -13,6 +13,8 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.chrkb1569.CharacterName.util.APIExceptionMessage.*;
+
 @Component
 @RequiredArgsConstructor
 public class CharacterNameTasklet implements Tasklet {
@@ -59,6 +61,9 @@ public class CharacterNameTasklet implements Tasklet {
 
         for(String characterName : characterNames) {
             String identifier = parseService.getCharacterIdentifier(characterName);
+
+            if(identifier.equals(DEFAULT_ERROR_MESSAGE)) continue;
+
             characterIdentifier.add(identifier);
             Thread.sleep(1000);
         }
