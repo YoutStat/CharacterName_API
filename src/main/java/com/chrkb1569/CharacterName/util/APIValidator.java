@@ -2,17 +2,13 @@ package com.chrkb1569.CharacterName.util;
 
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
-import org.springframework.beans.factory.annotation.Value;
 
 import static com.chrkb1569.CharacterName.util.APIExceptionMessage.getErrorMessageByType;
 
 @Slf4j
 public class APIValidator {
-    @Value("${api.request.error.errorKey}")
-    private static String ERROR_KEY;
-
-    @Value("${api.request.error.errorType}")
-    private static String ERROR_TYPE;
+    private static final String ERROR_KEY = "error";
+    private static final String ERROR_TYPE = "name";
 
     // API 데이터 유효성 확인
     public static boolean checkAPIValidation(String apiData) {

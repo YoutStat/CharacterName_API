@@ -15,7 +15,7 @@ public enum APIExceptionMessage {
     ERROR_MESSAGE_10("OPENAPI_CONTENT_0010", "서비스 점검 중입니다.")
     ;
 
-    private final static String DEFAULT_ERROR_MESSAGE = "API 요청에 실패하였습니다.";
+    public final static String DEFAULT_ERROR_MESSAGE = "API 요청에 실패하였습니다.";
     private String errorType;
     private String errorMessage;
 
